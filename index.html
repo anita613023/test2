@@ -12,143 +12,201 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@600;900&display=swap" rel="stylesheet">
 
   <style>
-    :root{
-      color-scheme: light;
-      --bg-base: #f8fafc;
+    :root {
+      --bg: #f8fafc;
       --ink: #0f172a;
       --muted: #64748b;
-      --red: #e11d48;
       --cyan: #0d9488;
-      --panel: rgba(255,255,255,.85);
-      --stage-bg: #ffffff;
-      --border-color: rgba(15,23,42,.08);
-      --font-sans: "Noto Sans TC", "Source Han Sans TC", system-ui, sans-serif;
-      --font-serif: "Noto Serif TC", "Source Han Serif TC", serif;
+      --red: #e11d48;
+      --panel: rgba(255,255,255,.82);
+      --stage: #fff;
+      --line: rgba(15,23,42,.08);
+      --font-sans: "Noto Sans TC", system-ui, sans-serif;
+      --font-serif: "Noto Serif TC", serif;
     }
-    *{box-sizing:border-box}
-    html,body{
-      margin:0;
-      min-height:100%;
-      background:var(--bg-base);
-      color:var(--ink);
-      font-family:var(--font-sans);
-      overflow:hidden;
+    * { box-sizing: border-box }
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--font-sans);
+      overflow: hidden;
     }
-    body:before{
-      content:"";
-      position:fixed;
-      inset:0;
-      background:radial-gradient(circle at 50% 35%, #e2e8f0 0, transparent 60%), linear-gradient(135deg, #f8fafc, #edf2f7 65%);
-      z-index:-2;
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at 50% 35%, #e2e8f0 0, transparent 60%), linear-gradient(135deg, #f8fafc, #edf2f7 65%);
+      z-index: -2;
     }
-    .grain{position:fixed;inset:0;pointer-events:none;opacity:.08;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.22'/%3E%3C/svg%3E")}
-    main{min-height:100svh;display:grid;grid-template-rows:auto 1fr auto;padding:clamp(16px,3vw,34px);gap:16px}
-    header,.footer{display:flex;align-items:center;justify-content:space-between;gap:14px;z-index:3}
-    .brand{font-size:.85rem;font-weight:700;letter-spacing:.18em;color:var(--ink)}.step{color:var(--muted);font-size:.85rem}.step b{color:var(--cyan)}
-    
-    .stage{
-      position:relative;
-      width:min(100%,1100px);
-      height:100%;
-      min-height:460px;
-      margin:auto;
-      border:1px solid var(--border-color);
-      border-radius:24px;
-      overflow:hidden;
-      background:var(--stage-bg);
-      box-shadow:0 20px 50px rgba(15, 23, 42, 0.06);
+    .grain {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .08;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.22'/%3E%3C/svg%3E");
     }
-    video,canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
-    video{opacity:.12;filter:saturate(.2) contrast(1.1)}
-    canvas{z-index:2;transform:none}
-    .shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,255,255,.6),transparent 35%,transparent 65%,rgba(255,255,255,.6));z-index:1;pointer-events:none}
-    
-    .word{
-      position:absolute;
-      z-index:2;
-      left:50%;
-      top:45%;
-      transform:translate(-50%,-50%);
-      width:2em;
-      height:1.7em;
-      font-family:var(--font-serif) !important;
-      font-size:clamp(6rem,18vw,12rem);
-      font-weight:900;
-      line-height:1;
-      color:var(--ink);
-      text-shadow:0 8px 30px rgba(15, 23, 42, 0.12);
-      user-select:none;
-      pointer-events:none;
+    main {
+      min-height: 100svh;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      padding: clamp(16px, 3vw, 34px);
+      gap: 16px;
     }
-    .char{
-      position:absolute;
-      display:block;
-      width:1em;
-      height:1em;
-      text-align:center;
-      font-family:var(--font-serif) !important;
-      will-change:transform,opacity;
-      transition:transform .55s cubic-bezier(.2,.75,.25,1);
+    header, .footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      z-index: 3;
     }
-    .char.top{left:.5em;top:0}.char.left{left:0;top:.72em}.char.right{left:1em;top:.72em;transform-origin:50% 80%}
-    .slash{position:absolute;z-index:4;width:240px;height:6px;background:linear-gradient(90deg,transparent,#fff 35%,var(--red));box-shadow:0 0 18px var(--red);border-radius:50%;opacity:0;transform:rotate(65deg);pointer-events:none}
-    
-    .message{position:absolute;left:50%;bottom:26px;z-index:4;transform:translateX(-50%);text-align:center;width:min(90%,560px)}
-    .message h1{margin:0;font-size:clamp(1.1rem,2.4vw,1.55rem);font-family:var(--font-sans);color:var(--ink)}
-    .message p{margin:.45rem 0 0;color:var(--muted);font-size:.95rem;font-family:var(--font-sans)}
-    
-    button{
-      appearance:none;
-      border:1px solid var(--border-color);
-      background:var(--panel);
-      color:var(--ink);
-      border-radius:999px;
-      padding:.72rem 1.1rem;
-      font-family:var(--font-sans);
-      font-weight:700;
-      cursor:pointer;
-      backdrop-filter:blur(12px);
-      box-shadow:0 2px 8px rgba(15, 23, 42, 0.04);
-      transition:all .2s ease;
+    .brand { font-size: .85rem; font-weight: 700; letter-spacing: .18em }
+    .step { font-size: .85rem; color: var(--muted) }
+    .step b { color: var(--cyan) }
+    .stage {
+      position: relative;
+      width: min(100%, 1100px);
+      height: 100%;
+      min-height: 460px;
+      margin: auto;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      overflow: hidden;
+      background: var(--stage);
+      box-shadow: 0 20px 50px rgba(15,23,42,.06);
     }
-    button:hover{border-color:var(--cyan);color:var(--cyan);background:#ffffff}
-    button.primary{background:var(--ink);color:#ffffff;border-color:transparent;box-shadow:0 4px 12px rgba(15, 23, 42, 0.15)}
-    button.primary:hover{background:#1e293b}
-    
-    .controls{display:flex;gap:8px;flex-wrap:wrap}
-    .status{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:.86rem;font-family:var(--font-sans)}
-    .dot{width:9px;height:9px;border-radius:50%;background:#cbd5e1}
-    .dot.on{background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
-    
-    .step-one .top{animation:fall-left .9s cubic-bezier(.2,.75,.25,1) forwards}
-    .complete .top{opacity:0}
-    .complete .right{animation:fall .9s cubic-bezier(.2,.75,.25,1) forwards}
-    .complete .left{transform:translateX(.5em)}
-    .striking .slash{animation:slash .45s ease-out}
-    .complete .message h1{color:var(--cyan)}
-    
-    @keyframes fall{25%{transform:translate(22px,8px) rotate(10deg)}100%{transform:translate(120px,75vh) rotate(85deg);opacity:0}}
-    @keyframes fall-left{25%{transform:translate(-18px,8px) rotate(-8deg)}100%{transform:translate(-120px,75vh) rotate(-80deg);opacity:0}}
-    @keyframes slash{0%{opacity:0;transform:rotate(65deg) scaleX(.2)}30%{opacity:1}100%{opacity:0;transform:rotate(65deg) scaleX(1.4)}}
-    @media(max-width:700px){main{padding:12px}.stage{min-height:0}.footer{align-items:flex-end}.status{display:none}.message{bottom:18px}.message p{font-size:.83rem}}
-    
-    #live-forest{position:absolute;inset:0;transform:none;z-index:2;pointer-events:none}
-    #overlay{z-index:3}
-    #model-loading{
-      position:absolute;
-      inset:20% 10% auto;
-      text-align:center;
-      z-index:5;
-      padding:20px;
-      background:#ffffff;
-      border:1px solid var(--border-color);
-      border-radius:12px;
-      font-family:var(--font-sans);
-      color:var(--muted);
-      box-shadow:0 10px 25px rgba(0,0,0,0.05);
+    video, canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scaleX(-1);
     }
-    .word[hidden]{display:none !important}
-    #model-loading[hidden]{display:none !important}
+    video { opacity: .12; filter: saturate(.2) contrast(1.1) }
+    canvas { z-index: 2; transform: none }
+    #live-forest { position: absolute; inset: 0; z-index: 2; pointer-events: none }
+    .shade {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background: linear-gradient(90deg, rgba(255,255,255,.6), transparent 35%, transparent 65%, rgba(255,255,255,.6));
+      pointer-events: none;
+    }
+    .word {
+      position: absolute;
+      left: 50%;
+      top: 45%;
+      z-index: 2;
+      transform: translate(-50%, -50%);
+      width: 2em;
+      height: 1.7em;
+      font-family: var(--font-serif);
+      font-size: clamp(6rem, 18vw, 12rem);
+      font-weight: 900;
+      line-height: 1;
+      color: var(--ink);
+      text-shadow: 0 8px 30px rgba(15, 23, 42, .12);
+      user-select: none;
+      pointer-events: none;
+    }
+    .char {
+      position: absolute;
+      display: block;
+      width: 1em;
+      height: 1em;
+      text-align: center;
+      will-change: transform, opacity;
+      transition: transform .55s cubic-bezier(.2,.75,.25,1);
+    }
+    .char.top { left: .5em; top: 0 }
+    .char.left { left: 0; top: .72em }
+    .char.right { left: 1em; top: .72em; transform-origin: 50% 80% }
+    .slash {
+      position: absolute;
+      z-index: 4;
+      width: 240px;
+      height: 6px;
+      background: linear-gradient(90deg, transparent, #fff 35%, var(--red));
+      box-shadow: 0 0 18px var(--red);
+      border-radius: 50%;
+      opacity: 0;
+      transform: rotate(65deg);
+      pointer-events: none;
+    }
+    .message {
+      position: absolute;
+      left: 50%;
+      bottom: 26px;
+      z-index: 4;
+      transform: translateX(-50%);
+      text-align: center;
+      width: min(90%, 560px);
+    }
+    .message h1 { margin: 0; font-size: clamp(1.1rem, 2.4vw, 1.55rem) }
+    .message p { margin: .45rem 0 0; color: var(--muted); font-size: .95rem }
+    button {
+      appearance: none;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--ink);
+      border-radius: 999px;
+      padding: .72rem 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 2px 8px rgba(15,23,42,.04);
+      transition: all .2s ease;
+    }
+    button:hover { border-color: var(--cyan); color: var(--cyan); background: #fff }
+    button.primary { background: var(--ink); color: #fff; border-color: transparent; box-shadow: 0 4px 12px rgba(15,23,42,.15) }
+    button.primary:hover { background: #1e293b }
+    .controls { display: flex; gap: 8px; flex-wrap: wrap }
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: .86rem;
+      color: var(--muted);
+    }
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #cbd5e1;
+    }
+    .dot.on { background: var(--cyan); box-shadow: 0 0 10px var(--cyan) }
+    .step-one .top { animation: fall-left .9s cubic-bezier(.2,.75,.25,1) forwards }
+    .complete .top { opacity: 0 }
+    .complete .right { animation: fall .9s cubic-bezier(.2,.75,.25,1) forwards }
+    .complete .left { transform: translateX(.5em) }
+    .striking .slash { animation: slash .45s ease-out }
+    .complete .message h1 { color: var(--cyan) }
+    @keyframes fall { 25%{transform:translate(22px,8px) rotate(10deg)}100%{transform:translate(120px,75vh) rotate(85deg);opacity:0} }
+    @keyframes fall-left { 25%{transform:translate(-18px,8px) rotate(-8deg)}100%{transform:translate(-120px,75vh) rotate(-80deg);opacity:0} }
+    @keyframes slash { 0%{opacity:0;transform:rotate(65deg) scaleX(.2)}30%{opacity:1}100%{opacity:0;transform:rotate(65deg) scaleX(1.4)} }
+    #model-loading {
+      position: absolute;
+      inset: 20% 10% auto;
+      z-index: 5;
+      padding: 20px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      text-align: center;
+      color: var(--muted);
+      box-shadow: 0 10px 25px rgba(0,0,0,.05);
+    }
+    .word[hidden], #model-loading[hidden] { display: none !important }
+    @media (max-width: 700px) {
+      main { padding: 12px }
+      .stage { min-height: 0 }
+      .footer { align-items: flex-end }
+      .status { display: none }
+      .message { bottom: 18px }
+      .message p { font-size: .83rem }
+    }
   </style>
 
   <link rel="stylesheet" href="interaction.css">
@@ -161,8 +219,6 @@
   <!-- 3. Pixi Live2D 適配套件 (優先讀取本地 vendor，若無自動載入 CDN) -->
   <script src="vendor/cubism4.min.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/pixi-live2d-display@0.4.0/dist/cubism4.min.js'"></script>
 
-  <script src="interaction.js"></script>
-  <script src="forest-tracking.js"></script>
 </head>
 <body>
   <div class="grain"></div>
@@ -219,54 +275,45 @@
     const notice = document.querySelector('#model-loading');
     const wordElem = document.querySelector('.word');
 
-    let step = 0;
-    let locked = false;
-    let playRevision = 0;
-    let slashCooldown = false;
+    const state = { step: 0, locked: false, playRevision: 0, slashCooldown: false };
 
-    // 超時安全容錯：若網路卡住未載入 Live2D，退回字體模式
-    setTimeout(() => {
-      if (!window.forestPlayer?.ready) {
-        console.warn('Live2D 載入逾時，切換為備用向量模式。');
-        if (notice) notice.hidden = true;
-        if (wordElem) wordElem.hidden = false;
-        if (window.forestPlayer) {
-          window.forestPlayer.ready = true;
-          window.forestPlayer.isFallback = true;
-        }
+    function setFallback() {
+      if (notice) notice.hidden = true;
+      if (wordElem) wordElem.hidden = false;
+      if (window.forestPlayer) {
+        window.forestPlayer.ready = true;
+        window.forestPlayer.isFallback = true;
       }
-    }, 4500);
+    }
 
     async function trigger() {
-      if (locked || step > 1) return;
+      if (state.locked || state.step > 1) return;
       if (window.forestPlayer && !window.forestPlayer.ready) return;
 
-      locked = true;
-      const rev = playRevision;
-      const current = step;
+      state.locked = true;
+      const revision = state.playRevision;
+      const current = state.step;
 
       title.textContent = '砍中了！';
       hint.textContent = '';
-
       stage.classList.add('striking');
       setTimeout(() => stage.classList.remove('striking'), 450);
 
-      // 觸發 Live2D cut 動畫
       if (window.forestPlayer?.isFallback) {
         if (current === 0) stage.classList.add('step-one');
         if (current === 1) stage.classList.add('complete');
       } else if (window.forestPlayer?.cut) {
         const success = await window.forestPlayer.cut(current);
-        if (!success || rev !== playRevision) {
-          locked = false;
+        if (!success || revision !== state.playRevision) {
+          state.locked = false;
           return;
         }
       }
 
-      step = current + 1;
-      locked = false;
+      state.step = current + 1;
+      state.locked = false;
 
-      if (step === 1) {
+      if (state.step === 1) {
         title.textContent = '「森」變成「林」了！';
         hint.textContent = '再用力向下劈一次，劈開左邊的「木」。';
       } else {
@@ -277,55 +324,58 @@
     }
 
     function reset() {
-      playRevision++;
+      state.playRevision += 1;
       window.forestPlayer?.reset?.();
-      step = 0;
-      locked = false;
-      slashCooldown = false;
+      state.step = 0;
+      state.locked = false;
+      state.slashCooldown = false;
       stage.classList.remove('step-one', 'complete', 'striking');
       title.textContent = '拿好 Wii 手把，用力向下揮！';
       hint.textContent = '由上往下猛力下劈，劈開上方的「木」。（若無手把可點擊模擬劈砍）';
     }
 
-    demoBtn.addEventListener('click', () => trigger());
+    demoBtn.addEventListener('click', trigger);
     resetBtn.addEventListener('click', reset);
 
-    // Wii WebSocket 連線
+    setTimeout(() => {
+      if (!window.forestPlayer?.ready) {
+        console.warn('Live2D 載入逾時，改用備用文字模式');
+        setFallback();
+      }
+    }, 4500);
+
     try {
       const ws = new WebSocket('ws://localhost:8080');
       ws.onopen = () => {
         dot.classList.add('on');
         status.textContent = 'Wii 手把已連線 (等待揮擊)';
       };
-
       ws.onmessage = (event) => {
-        let data = null;
-        try { data = JSON.parse(event.data); } catch (e) { return; }
-        const accel = data.accel || (data.payload && data.payload.accel);
+        let payload = null;
+        try { payload = JSON.parse(event.data); } catch { return; }
+        const accel = payload.accel || (payload.payload && payload.payload.accel);
         if (!accel) return;
 
         const force = Math.sqrt(accel.x * accel.x + accel.y * accel.y + accel.z * accel.z);
-        const SLASH_THRESHOLD = 2.3;
+        const threshold = 2.3;
 
-        if (force > SLASH_THRESHOLD && !slashCooldown && !locked && step <= 1) {
-          slashCooldown = true;
+        if (force > threshold && !state.slashCooldown && !state.locked && state.step <= 1) {
+          state.slashCooldown = true;
           trigger();
           if (ws.readyState === WebSocket.OPEN) {
             ws.send(JSON.stringify({ action: 'rumble', duration: 220 }));
           }
-          setTimeout(() => { slashCooldown = false; }, 600);
+          setTimeout(() => { state.slashCooldown = false; }, 600);
         }
       };
-
       ws.onerror = () => {
         status.textContent = '未啟動手把服務 (可按「模擬劈砍」測試)';
         dot.classList.remove('on');
       };
-    } catch(e) {
+    } catch {
       status.textContent = '純網頁展示模式';
     }
 
-    // 下一關
     const continueLink = document.createElement('button');
     continueLink.id = 'next';
     continueLink.className = 'next-level';

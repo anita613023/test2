@@ -1,3 +1,39 @@
+// Shared geometry helpers for the forest interaction.
+window.forestPoint = function (p, vw, vh, w, h) {
+  const s = Math.max(w / vw, h / vh);
+  return {
+    x: w - (p.x * vw * s - (vw * s - w) / 2),
+    y: p.y * vh * s - (vh * s - h) / 2
+  };
+};
+
+window.forestCrosses = function (a, b, r) {
+  let lo = 0, hi = 1;
+  for (const [v, d, min, max] of [[a.x, b.x - a.x, r.left, r.right], [a.y, b.y - a.y, r.top, r.bottom]]) {
+    if (Math.abs(d) < 1e-8) {
+      if (v < min || v > max) return false;
+    } else {
+      let x = (min - v) / d;
+      let y = (max - v) / d;
+      if (x > y) [x, y] = [y, x];
+      lo = Math.max(lo, x);
+      hi = Math.min(hi, y);
+      if (lo > hi) return false;
+    }
+  }
+  return true;
+};
+
+window.forestSlash = function (points, zone, height) {
+  if (points.length < 2) return false;
+  const a = points[0];
+  const b = points[points.length - 1];
+  const dt = (b.t - a.t) / 1000;
+  const dy = b.y - a.y;
+  if (dt <= 0 || dy < height * .045 || dy / dt < height * .7 || dy < Math.abs(b.x - a.x) * .6) return false;
+  return points.slice(1).some((p, i) => forestCrosses(points[i], p, zone));
+};
+
 window.forestPlayer = { ready: false, busy: false };
 
 (async () => {
