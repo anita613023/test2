@@ -1,0 +1,51 @@
+{
+  "Version": 3,
+  "FileReferences": {
+    "Moc": "forest.moc3",
+    "Textures": [
+      "forest.4096/texture_00.png",
+      "forest.4096/texture_01.png"
+    ],
+    "DisplayInfo": "forest.cdi3.json",
+    "Expressions": [
+      {
+        "Name": "cut_left",
+        "File": "cut_left.exp3.json"
+      },
+      {
+        "Name": "cut_top",
+        "File": "cut_top.exp3.json"
+      },
+      {
+        "Name": "forestmove1",
+        "File": "forestmove1.exp3.json"
+      },
+      {
+        "Name": "forestmove2",
+        "File": "forestmove2.exp3.json"
+      }
+    ],
+    "Motions": {
+      "Idle": [
+        {
+          "File": "forest.motion3.json",
+          "FadeInTime": 0,
+          "FadeOutTime": 0
+        }
+      ]
+    }
+  },
+  "Groups": [
+    {
+      "Target": "Parameter",
+      "Name": "EyeBlink",
+      "Ids": []
+    },
+    {
+      "Target": "Parameter",
+      "Name": "LipSync",
+      "Ids": []
+    }
+  ],
+  "HitAreas": []
+}

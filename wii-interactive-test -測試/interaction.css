@@ -1,0 +1,7 @@
+:root{--learning-letter-size:clamp(6rem,18vw,12rem)}
+.word,#letters{font-size:var(--learning-letter-size);font-family:"Noto Serif TC","Songti TC",serif;font-weight:900;line-height:1}
+#stage .next-level{position:absolute;top:20px;right:20px;z-index:8;min-width:150px;padding:14px 20px 24px;background:#f6f0e4;color:#101116;border:1px solid transparent;border-radius:999px;font:700 16px "Noto Sans TC","PingFang TC",system-ui,sans-serif;cursor:pointer;overflow:hidden;text-align:center}
+#stage .next-level::after{content:'手停留 1 秒，也可點擊';display:block;font-size:12px;font-weight:400;margin-top:4px}
+#stage .next-level::before{content:'';position:absolute;bottom:8px;left:15%;width:calc(var(--hold,0) * 70%);height:4px;background:#248a79;border-radius:4px;transition:width .06s linear}
+#stage .next-level[hidden]{display:none!important}
+.hand-pointer{position:fixed;z-index:100;width:22px;height:22px;border:2px solid white;border-radius:50%;background:#66e5d499;box-shadow:0 0 12px #66e5d466;transform:translate(-50%,-50%);pointer-events:none}

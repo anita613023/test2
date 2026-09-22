@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>體感互動測試架構</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- 頂部 HUD 面板 -->
+  <header id="hud">
+    <div class="hud-controls">
+      <button id="mic-toggle-btn" type="button">啟用麥克風</button>
+      <button id="test-shake-btn" type="button">按住模擬大聲</button>
+      
+      <!-- 麥克風靈敏度調節器 -->
+      <div class="sensitivity-control" title="麥克風增益靈敏度">
+        <label for="gain-slider">靈敏度</label>
+        <input type="range" id="gain-slider" min="1" max="8" step="0.5" value="4">
+      </div>
+
+      <div id="volume-meter-wrapper" title="即時音量">
+        <div id="volume-meter-fill"></div>
+      </div>
+    </div>
+
+    <div class="hud-status">
+      <div id="connection-status">模式：模擬模式 (未連後端)</div>
+      <div id="feedback-log">手把回饋：靜止</div>
+      <div id="debug-vol">音量: 0 | 抖動: 0px</div>
+      <div id="security-warning" class="security-warn" style="display: none;">⚠️ 手機需 HTTPS 才能收音</div>
+    </div>
+  </header>
+
+  <!-- 互動主場景 -->
+  <main id="stage">
+    <!-- 主要互動物件 A -->
+    <div id="target-object">
+      <!-- 充電進度環 (停留超過 1 秒) -->
+      <svg class="progress-ring" width="240" height="240">
+        <circle class="progress-ring-bg" stroke="#e2e8f0" stroke-width="6" fill="transparent" r="105" cx="120" cy="120"/>
+        <circle class="progress-ring-circle" stroke="#0ea5e9" stroke-width="6" fill="transparent" r="105" cx="120" cy="120"/>
+      </svg>
+      
+      <!-- 物件視覺本體 (抖動與 active 即時切換容器) -->
+      <div class="visual-container">
+        <!-- 實體圖片展示 -->
+        <img id="target-img" src="./assets/item_normal.png" alt="互動物件" onerror="this.classList.add('img-load-failed')">
+        <!-- 備用替代方塊 -->
+        <div class="visual-placeholder" id="target-placeholder">NORMAL</div>
+      </div>
+    </div>
+  </main>
+
+  <!-- 手把/滑鼠/觸控準星 B -->
+  <div id="custom-cursor">
+    <div class="cursor-crosshair"></div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

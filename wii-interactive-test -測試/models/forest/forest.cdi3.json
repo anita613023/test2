@@ -1,0 +1,42 @@
+{
+	"Version": 3,
+	"Parameters": [
+		{
+			"Id": "Param3",
+			"GroupId": "",
+			"Name": "晃動"
+		},
+		{
+			"Id": "Param4",
+			"GroupId": "",
+			"Name": "晃動2"
+		},
+		{
+			"Id": "Param",
+			"GroupId": "",
+			"Name": "砍木1"
+		},
+		{
+			"Id": "Param2",
+			"GroupId": "",
+			"Name": "砍木2"
+		},
+		{
+			"Id": "Param5",
+			"GroupId": "",
+			"Name": "林"
+		},
+		{
+			"Id": "Param6",
+			"GroupId": "",
+			"Name": "木"
+		}
+	],
+	"ParameterGroups": [],
+	"Parts": [
+		{
+			"Id": "Part3",
+			"Name": "forest.psd(未找到对应图层)"
+		}
+	]
+}
