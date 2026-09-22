@@ -1,7 +1,78 @@
-:root{--learning-letter-size:clamp(6rem,18vw,12rem)}
-.word,#letters{font-size:var(--learning-letter-size);font-family:"Noto Serif TC","Songti TC",serif;font-weight:900;line-height:1}
-#stage .next-level{position:absolute;top:20px;right:20px;z-index:8;min-width:150px;padding:14px 20px 24px;background:#f6f0e4;color:#101116;border:1px solid transparent;border-radius:999px;font:700 16px "Noto Sans TC","PingFang TC",system-ui,sans-serif;cursor:pointer;overflow:hidden;text-align:center}
-#stage .next-level::after{content:'手停留 1 秒，也可點擊';display:block;font-size:12px;font-weight:400;margin-top:4px}
-#stage .next-level::before{content:'';position:absolute;bottom:8px;left:15%;width:calc(var(--hold,0) * 70%);height:4px;background:#248a79;border-radius:4px;transition:width .06s linear}
-#stage .next-level[hidden]{display:none!important}
-.hand-pointer{position:fixed;z-index:100;width:22px;height:22px;border:2px solid white;border-radius:50%;background:#66e5d499;box-shadow:0 0 12px #66e5d466;transform:translate(-50%,-50%);pointer-events:none}
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@600;900&display=swap');
+
+:root {
+  --learning-letter-size: clamp(6rem, 18vw, 12rem);
+  --font-serif: "Noto Serif TC", "Source Han Serif TC", serif;
+  --font-sans: "Noto Sans TC", "Source Han Sans TC", system-ui, sans-serif;
+}
+
+.word, #letters, .word span, #letters span {
+  font-size: var(--learning-letter-size);
+  font-family: var(--font-serif) !important;
+  font-weight: 900;
+  line-height: 1;
+}
+
+#stage .next-level {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 8;
+  min-width: 150px;
+  padding: 14px 20px 24px;
+  background: #0f172a;
+  color: #ffffff;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-family: var(--font-sans) !important;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  overflow: hidden;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.15);
+  transition: all .2s ease;
+}
+
+#stage .next-level:hover {
+  background: #1e293b;
+  transform: translateY(-2px);
+}
+
+#stage .next-level::after {
+  content: '手停留 1 秒，也可點擊';
+  display: block;
+  font-size: 12px;
+  font-weight: 400;
+  color: #94a3b8;
+  margin-top: 4px;
+}
+
+#stage .next-level::before {
+  content: '';
+  position: absolute;
+  bottom: 8px;
+  left: 15%;
+  width: calc(var(--hold, 0) * 70%);
+  height: 4px;
+  background: #0d9488;
+  border-radius: 4px;
+  transition: width .06s linear;
+}
+
+#stage .next-level[hidden] {
+  display: none !important;
+}
+
+.hand-pointer {
+  position: fixed;
+  z-index: 100;
+  width: 24px;
+  height: 24px;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  background: #0d9488cc;
+  box-shadow: 0 0 14px rgba(13, 148, 136, 0.4);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}

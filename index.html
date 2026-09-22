@@ -1,63 +1,342 @@
-<!DOCTYPE html>
-<html lang="zh-TW">
+<!doctype html>
+<html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>體感互動測試架構</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#f8fafc" />
+  <title>拆字試煉｜森 → 林 → 木</title>
+  <meta name="description" content="以 Wii 手把體感揮擊，讓「森」變成「木」的互動原型。" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@600;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      color-scheme: light;
+      --bg-base: #f8fafc;
+      --ink: #0f172a;
+      --muted: #64748b;
+      --red: #e11d48;
+      --cyan: #0d9488;
+      --panel: rgba(255,255,255,.85);
+      --stage-bg: #ffffff;
+      --border-color: rgba(15,23,42,.08);
+      --font-sans: "Noto Sans TC", "Source Han Sans TC", system-ui, sans-serif;
+      --font-serif: "Noto Serif TC", "Source Han Serif TC", serif;
+    }
+    *{box-sizing:border-box}
+    html,body{
+      margin:0;
+      min-height:100%;
+      background:var(--bg-base);
+      color:var(--ink);
+      font-family:var(--font-sans);
+      overflow:hidden;
+    }
+    body:before{
+      content:"";
+      position:fixed;
+      inset:0;
+      background:radial-gradient(circle at 50% 35%, #e2e8f0 0, transparent 60%), linear-gradient(135deg, #f8fafc, #edf2f7 65%);
+      z-index:-2;
+    }
+    .grain{position:fixed;inset:0;pointer-events:none;opacity:.08;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.22'/%3E%3C/svg%3E")}
+    main{min-height:100svh;display:grid;grid-template-rows:auto 1fr auto;padding:clamp(16px,3vw,34px);gap:16px}
+    header,.footer{display:flex;align-items:center;justify-content:space-between;gap:14px;z-index:3}
+    .brand{font-size:.85rem;font-weight:700;letter-spacing:.18em;color:var(--ink)}.step{color:var(--muted);font-size:.85rem}.step b{color:var(--cyan)}
+    
+    .stage{
+      position:relative;
+      width:min(100%,1100px);
+      height:100%;
+      min-height:460px;
+      margin:auto;
+      border:1px solid var(--border-color);
+      border-radius:24px;
+      overflow:hidden;
+      background:var(--stage-bg);
+      box-shadow:0 20px 50px rgba(15, 23, 42, 0.06);
+    }
+    video,canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+    video{opacity:.12;filter:saturate(.2) contrast(1.1)}
+    canvas{z-index:2;transform:none}
+    .shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,255,255,.6),transparent 35%,transparent 65%,rgba(255,255,255,.6));z-index:1;pointer-events:none}
+    
+    .word{
+      position:absolute;
+      z-index:2;
+      left:50%;
+      top:45%;
+      transform:translate(-50%,-50%);
+      width:2em;
+      height:1.7em;
+      font-family:var(--font-serif) !important;
+      font-size:clamp(6rem,18vw,12rem);
+      font-weight:900;
+      line-height:1;
+      color:var(--ink);
+      text-shadow:0 8px 30px rgba(15, 23, 42, 0.12);
+      user-select:none;
+      pointer-events:none;
+    }
+    .char{
+      position:absolute;
+      display:block;
+      width:1em;
+      height:1em;
+      text-align:center;
+      font-family:var(--font-serif) !important;
+      will-change:transform,opacity;
+      transition:transform .55s cubic-bezier(.2,.75,.25,1);
+    }
+    .char.top{left:.5em;top:0}.char.left{left:0;top:.72em}.char.right{left:1em;top:.72em;transform-origin:50% 80%}
+    .slash{position:absolute;z-index:4;width:240px;height:6px;background:linear-gradient(90deg,transparent,#fff 35%,var(--red));box-shadow:0 0 18px var(--red);border-radius:50%;opacity:0;transform:rotate(65deg);pointer-events:none}
+    
+    .message{position:absolute;left:50%;bottom:26px;z-index:4;transform:translateX(-50%);text-align:center;width:min(90%,560px)}
+    .message h1{margin:0;font-size:clamp(1.1rem,2.4vw,1.55rem);font-family:var(--font-sans);color:var(--ink)}
+    .message p{margin:.45rem 0 0;color:var(--muted);font-size:.95rem;font-family:var(--font-sans)}
+    
+    button{
+      appearance:none;
+      border:1px solid var(--border-color);
+      background:var(--panel);
+      color:var(--ink);
+      border-radius:999px;
+      padding:.72rem 1.1rem;
+      font-family:var(--font-sans);
+      font-weight:700;
+      cursor:pointer;
+      backdrop-filter:blur(12px);
+      box-shadow:0 2px 8px rgba(15, 23, 42, 0.04);
+      transition:all .2s ease;
+    }
+    button:hover{border-color:var(--cyan);color:var(--cyan);background:#ffffff}
+    button.primary{background:var(--ink);color:#ffffff;border-color:transparent;box-shadow:0 4px 12px rgba(15, 23, 42, 0.15)}
+    button.primary:hover{background:#1e293b}
+    
+    .controls{display:flex;gap:8px;flex-wrap:wrap}
+    .status{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:.86rem;font-family:var(--font-sans)}
+    .dot{width:9px;height:9px;border-radius:50%;background:#cbd5e1}
+    .dot.on{background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
+    
+    .step-one .top{animation:fall-left .9s cubic-bezier(.2,.75,.25,1) forwards}
+    .complete .top{opacity:0}
+    .complete .right{animation:fall .9s cubic-bezier(.2,.75,.25,1) forwards}
+    .complete .left{transform:translateX(.5em)}
+    .striking .slash{animation:slash .45s ease-out}
+    .complete .message h1{color:var(--cyan)}
+    
+    @keyframes fall{25%{transform:translate(22px,8px) rotate(10deg)}100%{transform:translate(120px,75vh) rotate(85deg);opacity:0}}
+    @keyframes fall-left{25%{transform:translate(-18px,8px) rotate(-8deg)}100%{transform:translate(-120px,75vh) rotate(-80deg);opacity:0}}
+    @keyframes slash{0%{opacity:0;transform:rotate(65deg) scaleX(.2)}30%{opacity:1}100%{opacity:0;transform:rotate(65deg) scaleX(1.4)}}
+    @media(max-width:700px){main{padding:12px}.stage{min-height:0}.footer{align-items:flex-end}.status{display:none}.message{bottom:18px}.message p{font-size:.83rem}}
+    
+    #live-forest{position:absolute;inset:0;transform:none;z-index:2;pointer-events:none}
+    #overlay{z-index:3}
+    #model-loading{
+      position:absolute;
+      inset:20% 10% auto;
+      text-align:center;
+      z-index:5;
+      padding:20px;
+      background:#ffffff;
+      border:1px solid var(--border-color);
+      border-radius:12px;
+      font-family:var(--font-sans);
+      color:var(--muted);
+      box-shadow:0 10px 25px rgba(0,0,0,0.05);
+    }
+    .word[hidden]{display:none !important}
+    #model-loading[hidden]{display:none !important}
+  </style>
+
+  <link rel="stylesheet" href="interaction.css">
+
+  <!-- ==================== Live2D 核心執行引擎載入 ==================== -->
+  <!-- 1. Pixi.js (優先讀取本地 vendor，若無自動載入 CDN) -->
+  <script src="vendor/pixi.min.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/pixi.js@6.5.8/dist/browser/pixi.min.js'"></script>
+  <!-- 2. Live2D Cubism Core 官方核心 (支援 Cubism 4 與 5) -->
+  <script src="https://cubism.live2d.com/sdk-web/core/06/live2dcubismcore.min.js"></script>
+  <!-- 3. Pixi Live2D 適配套件 (優先讀取本地 vendor，若無自動載入 CDN) -->
+  <script src="vendor/cubism4.min.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/pixi-live2d-display@0.4.0/dist/cubism4.min.js'"></script>
+
+  <script src="interaction.js"></script>
+  <script src="forest-tracking.js"></script>
 </head>
 <body>
+  <div class="grain"></div>
+  <main>
+    <header>
+      <div class="brand">拆字試煉</div>
+      <div class="step">第一關 <b>森 → 林 → 木</b></div>
+    </header>
 
-  <!-- 頂部 HUD 面板 -->
-  <header id="hud">
-    <div class="hud-controls">
-      <button id="mic-toggle-btn" type="button">啟用麥克風</button>
-      <button id="test-shake-btn" type="button">按住模擬大聲</button>
+    <section class="stage" id="stage" aria-label="互動區">
+      <video id="camera" autoplay muted playsinline hidden></video>
+      <canvas id="overlay"></canvas>
+      <div class="shade"></div>
       
-      <!-- 麥克風靈敏度調節器 -->
-      <div class="sensitivity-control" title="麥克風增益靈敏度">
-        <label for="gain-slider">靈敏度</label>
-        <input type="range" id="gain-slider" min="1" max="8" step="0.5" value="4">
-      </div>
-
-      <div id="volume-meter-wrapper" title="即時音量">
-        <div id="volume-meter-fill"></div>
-      </div>
-    </div>
-
-    <div class="hud-status">
-      <div id="connection-status">模式：模擬模式 (未連後端)</div>
-      <div id="feedback-log">手把回饋：靜止</div>
-      <div id="debug-vol">音量: 0 | 抖動: 0px</div>
-      <div id="security-warning" class="security-warn" style="display: none;">⚠️ 手機需 HTTPS 才能收音</div>
-    </div>
-  </header>
-
-  <!-- 互動主場景 -->
-  <main id="stage">
-    <!-- 主要互動物件 A -->
-    <div id="target-object">
-      <!-- 充電進度環 (停留超過 1 秒) -->
-      <svg class="progress-ring" width="240" height="240">
-        <circle class="progress-ring-bg" stroke="#e2e8f0" stroke-width="6" fill="transparent" r="105" cx="120" cy="120"/>
-        <circle class="progress-ring-circle" stroke="#0ea5e9" stroke-width="6" fill="transparent" r="105" cx="120" cy="120"/>
-      </svg>
+      <div id="model-loading" role="status">正在載入 Live2D 模型…</div>
       
-      <!-- 物件視覺本體 (抖動與 active 即時切換容器) -->
-      <div class="visual-container">
-        <!-- 實體圖片展示 -->
-        <img id="target-img" src="./assets/item_normal.png" alt="互動物件" onerror="this.classList.add('img-load-failed')">
-        <!-- 備用替代方塊 -->
-        <div class="visual-placeholder" id="target-placeholder">NORMAL</div>
+      <!-- 文字備用 (Live2D 載入完成後會自動切為 hidden) -->
+      <div class="word" hidden aria-label="森">
+        <span class="char top">木</span>
+        <span class="char left">木</span>
+        <span class="char right">木</span>
+      </div>
+      
+      <div class="slash" id="slash"></div>
+      <div class="message">
+        <h1 id="title">拿好 Wii 手把，用力向下揮！</h1>
+        <p id="hint">由上往下猛力下劈，劈開上方的「木」。（若無手把可點擊模擬劈砍）</p>
+      </div>
+    </section>
+
+    <div class="footer">
+      <div class="controls">
+        <button class="primary" id="demo">模擬劈砍 (手動)</button>
+        <button id="reset">重新開始</button>
+      </div>
+      <div class="status">
+        <span class="dot" id="dot"></span>
+        <span id="status">手把連線狀態：偵測中...</span>
       </div>
     </div>
   </main>
 
-  <!-- 手把/滑鼠/觸控準星 B -->
-  <div id="custom-cursor">
-    <div class="cursor-crosshair"></div>
-  </div>
+  <!-- 載入 Live2D 樹林控制器腳本 -->
+  <script src="live-forest.js"></script>
 
-  <script src="app.js"></script>
+  <script>
+    const stage = document.querySelector('#stage');
+    const title = document.querySelector('#title');
+    const hint = document.querySelector('#hint');
+    const status = document.querySelector('#status');
+    const dot = document.querySelector('#dot');
+    const demoBtn = document.querySelector('#demo');
+    const resetBtn = document.querySelector('#reset');
+    const notice = document.querySelector('#model-loading');
+    const wordElem = document.querySelector('.word');
+
+    let step = 0;
+    let locked = false;
+    let playRevision = 0;
+    let slashCooldown = false;
+
+    // 超時安全容錯：若網路卡住未載入 Live2D，退回字體模式
+    setTimeout(() => {
+      if (!window.forestPlayer?.ready) {
+        console.warn('Live2D 載入逾時，切換為備用向量模式。');
+        if (notice) notice.hidden = true;
+        if (wordElem) wordElem.hidden = false;
+        if (window.forestPlayer) {
+          window.forestPlayer.ready = true;
+          window.forestPlayer.isFallback = true;
+        }
+      }
+    }, 4500);
+
+    async function trigger() {
+      if (locked || step > 1) return;
+      if (window.forestPlayer && !window.forestPlayer.ready) return;
+
+      locked = true;
+      const rev = playRevision;
+      const current = step;
+
+      title.textContent = '砍中了！';
+      hint.textContent = '';
+
+      stage.classList.add('striking');
+      setTimeout(() => stage.classList.remove('striking'), 450);
+
+      // 觸發 Live2D cut 動畫
+      if (window.forestPlayer?.isFallback) {
+        if (current === 0) stage.classList.add('step-one');
+        if (current === 1) stage.classList.add('complete');
+      } else if (window.forestPlayer?.cut) {
+        const success = await window.forestPlayer.cut(current);
+        if (!success || rev !== playRevision) {
+          locked = false;
+          return;
+        }
+      }
+
+      step = current + 1;
+      locked = false;
+
+      if (step === 1) {
+        title.textContent = '「森」變成「林」了！';
+        hint.textContent = '再用力向下劈一次，劈開左邊的「木」。';
+      } else {
+        title.textContent = '成功！剩下一個「木」';
+        hint.textContent = '完成了！請前往下一關。';
+        stage.classList.add('complete');
+      }
+    }
+
+    function reset() {
+      playRevision++;
+      window.forestPlayer?.reset?.();
+      step = 0;
+      locked = false;
+      slashCooldown = false;
+      stage.classList.remove('step-one', 'complete', 'striking');
+      title.textContent = '拿好 Wii 手把，用力向下揮！';
+      hint.textContent = '由上往下猛力下劈，劈開上方的「木」。（若無手把可點擊模擬劈砍）';
+    }
+
+    demoBtn.addEventListener('click', () => trigger());
+    resetBtn.addEventListener('click', reset);
+
+    // Wii WebSocket 連線
+    try {
+      const ws = new WebSocket('ws://localhost:8080');
+      ws.onopen = () => {
+        dot.classList.add('on');
+        status.textContent = 'Wii 手把已連線 (等待揮擊)';
+      };
+
+      ws.onmessage = (event) => {
+        let data = null;
+        try { data = JSON.parse(event.data); } catch (e) { return; }
+        const accel = data.accel || (data.payload && data.payload.accel);
+        if (!accel) return;
+
+        const force = Math.sqrt(accel.x * accel.x + accel.y * accel.y + accel.z * accel.z);
+        const SLASH_THRESHOLD = 2.3;
+
+        if (force > SLASH_THRESHOLD && !slashCooldown && !locked && step <= 1) {
+          slashCooldown = true;
+          trigger();
+          if (ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({ action: 'rumble', duration: 220 }));
+          }
+          setTimeout(() => { slashCooldown = false; }, 600);
+        }
+      };
+
+      ws.onerror = () => {
+        status.textContent = '未啟動手把服務 (可按「模擬劈砍」測試)';
+        dot.classList.remove('on');
+      };
+    } catch(e) {
+      status.textContent = '純網頁展示模式';
+    }
+
+    // 下一關
+    const continueLink = document.createElement('button');
+    continueLink.id = 'next';
+    continueLink.className = 'next-level';
+    continueLink.hidden = true;
+    continueLink.textContent = '下一關';
+    continueLink.onclick = () => location.assign('levels.html');
+    stage.append(continueLink);
+
+    new MutationObserver(() => {
+      continueLink.hidden = !stage.classList.contains('complete');
+    }).observe(stage, { attributes: true, attributeFilter: ['class'] });
+  </script>
 </body>
 </html>
